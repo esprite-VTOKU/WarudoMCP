@@ -12,7 +12,7 @@ WarudoMCP delivers AI control over Warudo through five phases: establish the MCP
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: MCP Server Foundation** - Project scaffolding, WebSocket/REST clients, stdio transport, error handling
+- [x] **Phase 1: MCP Server Foundation** - Project scaffolding, WebSocket/REST clients, stdio transport, error handling
 - [ ] **Phase 2: Scene Inspection** - Read-only tools for querying scene state, assets, and server info
 - [ ] **Phase 3: Asset Control** - Mutation tools for setting values, invoking triggers, and messaging plugins
 - [ ] **Phase 4: Blueprint CRUD** - Create, list, enable, disable, and remove blueprint graphs
@@ -34,7 +34,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 - [x] 01-01-PLAN.md -- Project scaffolding + Warudo connection clients (WebSocket + REST)
-- [ ] 01-02-PLAN.md -- MCP server entry point, tool registration, build verification
+- [x] 01-02-PLAN.md -- MCP server entry point, tool registration, build verification
 
 ### Phase 2: Scene Inspection
 **Goal**: AI assistants can read and understand the current state of a Warudo scene -- what assets exist, what their properties are, and what Warudo instance is running
@@ -96,7 +96,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. MCP Server Foundation | 1/2 | In progress | - |
+| 1. MCP Server Foundation | 2/2 | Complete | 2026-03-09 |
 | 2. Scene Inspection | 0/TBD | Not started | - |
 | 3. Asset Control | 0/TBD | Not started | - |
 | 4. Blueprint CRUD | 0/TBD | Not started | - |

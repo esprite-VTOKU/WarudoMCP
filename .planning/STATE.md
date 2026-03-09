@@ -9,29 +9,29 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 
 ## Current Position
 
-Phase: 1 of 5 (MCP Server Foundation)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-09 -- Completed 01-01 (Project scaffold and Warudo clients)
+Phase: 1 of 5 (MCP Server Foundation) -- COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-03-09 -- Completed 01-02 (MCP server entry point)
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 3 min
-- Total execution time: 0.05 hours
+- Total plans completed: 2
+- Average duration: 2 min
+- Total execution time: 0.07 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-mcp-server-foundation | 1 | 3 min | 3 min |
+| 01-mcp-server-foundation | 2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min)
-- Trend: baseline
+- Last 5 plans: 01-01 (3 min), 01-02 (1 min)
+- Trend: accelerating
 
 *Updated after each plan completion*
 
@@ -48,6 +48,8 @@ Recent decisions affecting current work:
 - [01-01]: Used vitest for testing (fast, ESM-native, zero-config with TypeScript)
 - [01-01]: WebSocket send() uses simple requestId correlation with 10s timeout (refinable later)
 - [01-01]: REST client separates network errors from HTTP status errors with different actionable messages
+- [01-02]: check_connection tests WebSocket and REST independently so one failure does not mask the other
+- [01-02]: ping tool reports wsClient.getState() in both success and error paths for LLM visibility
 
 ### Pending Todos
 
@@ -61,5 +63,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed 01-01-PLAN.md (Project scaffold and Warudo clients)
+Stopped at: Completed 01-02-PLAN.md (MCP server entry point) -- Phase 1 complete
 Resume file: None
