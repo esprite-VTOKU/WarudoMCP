@@ -77,24 +77,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONN-01 | — | Pending |
-| CONN-02 | — | Pending |
-| CONN-03 | — | Pending |
-| SCNE-01 | — | Pending |
-| SCNE-02 | — | Pending |
-| SCNE-03 | — | Pending |
-| CTRL-01 | — | Pending |
-| CTRL-02 | — | Pending |
-| CTRL-03 | — | Pending |
-| BPRT-01 | — | Pending |
-| BPRT-02 | — | Pending |
-| BPRT-03 | — | Pending |
+| CONN-01 | Phase 1: MCP Server Foundation | Pending |
+| CONN-02 | Phase 1: MCP Server Foundation | Pending |
+| CONN-03 | Phase 1: MCP Server Foundation | Pending |
+| SCNE-01 | Phase 2: Scene Inspection | Pending |
+| SCNE-02 | Phase 2: Scene Inspection | Pending |
+| SCNE-03 | Phase 2: Scene Inspection | Pending |
+| CTRL-01 | Phase 3: Asset Control | Pending |
+| CTRL-02 | Phase 3: Asset Control | Pending |
+| CTRL-03 | Phase 3: Asset Control | Pending |
+| BPRT-01 | Phase 4: Blueprint CRUD | Pending |
+| BPRT-02 | Phase 4: Blueprint CRUD | Pending |
+| BPRT-03 | Phase 5: Blueprint Intelligence | Pending |
 
 **Coverage:**
 - v1 requirements: 12 total
-- Mapped to phases: 0
-- Unmapped: 12 ⚠️
+- Mapped to phases: 12
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after initial definition*
+*Last updated: 2026-03-09 after roadmap creation*
