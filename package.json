@@ -4,6 +4,9 @@
   "description": "MCP server for controlling Warudo via WebSocket and REST APIs",
   "type": "module",
   "main": "build/index.js",
+  "bin": {
+    "warudo-mcp": "build/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
