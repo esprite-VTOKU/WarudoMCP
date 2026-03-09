@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Server establishes REST connection to Warudo on configurable host:port (default http://localhost:19052)
   4. When Warudo is unreachable or disconnects, MCP tool calls return clear, structured error messages (not crashes or timeouts)
   5. All logging goes to stderr only -- stdout is reserved exclusively for MCP JSON-RPC
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 01-01-PLAN.md -- Project scaffolding + Warudo connection clients (WebSocket + REST)
@@ -96,7 +96,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. MCP Server Foundation | 2/2 | Complete | 2026-03-09 |
+| 1. MCP Server Foundation | 2/2 | Complete    | 2026-03-09 |
 | 2. Scene Inspection | 0/TBD | Not started | - |
 | 3. Asset Control | 0/TBD | Not started | - |
 | 4. Blueprint CRUD | 0/TBD | Not started | - |
