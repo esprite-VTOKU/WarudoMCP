@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,7 @@
     "@types/node": "^25.4.0",
     "@types/ws": "^8.18.1",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
   }
 }
