@@ -9,8 +9,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Connection
 
-- [ ] **CONN-01**: MCP server connects to Warudo WebSocket API on configurable host:port (default ws://localhost:19053)
-- [ ] **CONN-02**: MCP server connects to Warudo REST API on configurable host:port (default http://localhost:19052)
+- [x] **CONN-01**: MCP server connects to Warudo WebSocket API on configurable host:port (default ws://localhost:19053)
+- [x] **CONN-02**: MCP server connects to Warudo REST API on configurable host:port (default http://localhost:19052)
 - [ ] **CONN-03**: Server reports clear error messages when Warudo is unreachable or disconnects
 
 ### Scene Inspection
@@ -77,8 +77,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONN-01 | Phase 1: MCP Server Foundation | Pending |
-| CONN-02 | Phase 1: MCP Server Foundation | Pending |
+| CONN-01 | Phase 1: MCP Server Foundation | Complete |
+| CONN-02 | Phase 1: MCP Server Foundation | Complete |
 | CONN-03 | Phase 1: MCP Server Foundation | Pending |
 | SCNE-01 | Phase 2: Scene Inspection | Pending |
 | SCNE-02 | Phase 2: Scene Inspection | Pending |
@@ -97,4 +97,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after roadmap creation*
+*Last updated: 2026-03-09 after 01-01 completion*

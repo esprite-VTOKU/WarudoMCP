@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-03-09)
 ## Current Position
 
 Phase: 1 of 5 (MCP Server Foundation)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-09 -- Roadmap created with 5 phases covering 12 requirements
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-03-09 -- Completed 01-01 (Project scaffold and Warudo clients)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 3 min
+- Total execution time: 0.05 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-mcp-server-foundation | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: -
-- Trend: -
+- Last 5 plans: 01-01 (3 min)
+- Trend: baseline
 
 *Updated after each plan completion*
 
@@ -45,6 +45,9 @@ Recent decisions affecting current work:
 - [Roadmap]: WebSocket protocol is documented (port 19053), REST API on port 19052 -- no protocol discovery phase needed
 - [Roadmap]: 5 phases derived from 4 requirement categories plus foundation; depth=comprehensive but 12 requirements don't warrant artificial padding
 - [Roadmap]: Blueprint work split into CRUD (Phase 4) and Intelligence (Phase 5) because NL generation depends on stable graph creation
+- [01-01]: Used vitest for testing (fast, ESM-native, zero-config with TypeScript)
+- [01-01]: WebSocket send() uses simple requestId correlation with 10s timeout (refinable later)
+- [01-01]: REST client separates network errors from HTTP status errors with different actionable messages
 
 ### Pending Todos
 
@@ -58,5 +61,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Roadmap created, ready to plan Phase 1
+Stopped at: Completed 01-01-PLAN.md (Project scaffold and Warudo clients)
 Resume file: None
