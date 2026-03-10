@@ -29,7 +29,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **BPRT-01**: User can create new blueprint graphs with specified nodes and connections
 - [ ] **BPRT-02**: User can list, enable, disable, and remove existing blueprint graphs
-- [ ] **BPRT-03**: User can generate blueprints from natural language descriptions of desired behavior
+- [x] **BPRT-03**: User can generate blueprints from natural language descriptions of desired behavior
 
 ## v2 Requirements
 
@@ -88,7 +88,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CTRL-03 | Phase 3: Asset Control | Complete |
 | BPRT-01 | Phase 4: Blueprint CRUD | Pending |
 | BPRT-02 | Phase 4: Blueprint CRUD | Pending |
-| BPRT-03 | Phase 5: Blueprint Intelligence | Pending |
+| BPRT-03 | Phase 5: Blueprint Intelligence | Complete |
 
 **Coverage:**
 - v1 requirements: 12 total

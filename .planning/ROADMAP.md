@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Scene Inspection** - Read-only tools for querying scene state, assets, and server info
 - [x] **Phase 3: Asset Control** - Mutation tools for setting values, invoking triggers, and messaging plugins
 - [ ] **Phase 4: Blueprint CRUD** - Create, list, enable, disable, and remove blueprint graphs
-- [ ] **Phase 5: Blueprint Intelligence** - Natural language to blueprint generation
+- [x] **Phase 5: Blueprint Intelligence** - Natural language to blueprint generation
 
 ## Phase Details
 
@@ -85,11 +85,11 @@ Plans:
   1. User can describe a desired behavior in natural language (e.g., "when I press spacebar, make the character wave") and the AI generates and imports a working blueprint into Warudo
   2. Generated blueprints use correct node types, valid port connections, and proper data/flow wiring
   3. When a blueprint description is ambiguous or references unknown capabilities, the AI asks clarifying questions or explains what is not possible rather than generating invalid graphs
-**Plans**: 0/2 plans complete
+**Plans**: 2/2 plans complete
 
 Plans:
-- [ ] 05-01-PLAN.md -- Node type extraction tool (list_node_types) and helpers
-- [ ] 05-02-PLAN.md -- MCP node catalog resource, index.ts integration, enhanced descriptions
+- [x] 05-01-PLAN.md -- Node type extraction tool (list_node_types) and helpers
+- [x] 05-02-PLAN.md -- MCP node catalog resource, index.ts integration, enhanced descriptions
 
 ## Progress
 
@@ -102,4 +102,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 2. Scene Inspection | 2/2 | Complete    | 2026-03-09 |
 | 3. Asset Control | 1/1 | Complete    | 2026-03-09 |
 | 4. Blueprint CRUD | 0/TBD | Not started | - |
-| 5. Blueprint Intelligence | 0/TBD | Not started | - |
+| 5. Blueprint Intelligence | 2/2 | Complete    | 2026-03-09 |
