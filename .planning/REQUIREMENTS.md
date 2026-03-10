@@ -21,9 +21,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Asset Control
 
-- [ ] **CTRL-01**: User can set any asset's data input port value by entity ID, port key, and value
-- [ ] **CTRL-02**: User can invoke any trigger port on an asset or node by entity ID and port key
-- [ ] **CTRL-03**: User can send messages to Warudo plugins via sendPluginMessage with plugin ID, action, and payload
+- [x] **CTRL-01**: User can set any asset's data input port value by entity ID, port key, and value
+- [x] **CTRL-02**: User can invoke any trigger port on an asset or node by entity ID and port key
+- [x] **CTRL-03**: User can send messages to Warudo plugins via sendPluginMessage with plugin ID, action, and payload
 
 ### Blueprint Generation
 
@@ -83,9 +83,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCNE-01 | Phase 2: Scene Inspection | Complete |
 | SCNE-02 | Phase 2: Scene Inspection | Complete |
 | SCNE-03 | Phase 2: Scene Inspection | Complete |
-| CTRL-01 | Phase 3: Asset Control | Pending |
-| CTRL-02 | Phase 3: Asset Control | Pending |
-| CTRL-03 | Phase 3: Asset Control | Pending |
+| CTRL-01 | Phase 3: Asset Control | Complete |
+| CTRL-02 | Phase 3: Asset Control | Complete |
+| CTRL-03 | Phase 3: Asset Control | Complete |
 | BPRT-01 | Phase 4: Blueprint CRUD | Pending |
 | BPRT-02 | Phase 4: Blueprint CRUD | Pending |
 | BPRT-03 | Phase 5: Blueprint Intelligence | Pending |
@@ -97,4 +97,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after 02-02 completion*
+*Last updated: 2026-03-09 after 03-01 completion*

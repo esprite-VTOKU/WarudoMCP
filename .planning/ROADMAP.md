@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: MCP Server Foundation** - Project scaffolding, WebSocket/REST clients, stdio transport, error handling
 - [x] **Phase 2: Scene Inspection** - Read-only tools for querying scene state, assets, and server info
-- [ ] **Phase 3: Asset Control** - Mutation tools for setting values, invoking triggers, and messaging plugins
+- [x] **Phase 3: Asset Control** - Mutation tools for setting values, invoking triggers, and messaging plugins
 - [ ] **Phase 4: Blueprint CRUD** - Create, list, enable, disable, and remove blueprint graphs
 - [ ] **Phase 5: Blueprint Intelligence** - Natural language to blueprint generation
 
@@ -59,10 +59,10 @@ Plans:
   1. User can ask the AI to change any asset's data input port value (e.g., move a prop, change a character expression, adjust camera FOV) and see the change reflected in Warudo
   2. User can ask the AI to invoke any trigger port on an asset or node (e.g., play an animation, take a screenshot) and observe the triggered action in Warudo
   3. User can ask the AI to send a message to a Warudo plugin with a specific plugin ID, action, and payload, and the plugin receives it
-**Plans**: TBD
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 03-01: TBD
+- [x] 03-01-PLAN.md -- Asset mutation tools (set_data_input, invoke_trigger, send_plugin_message)
 
 ### Phase 4: Blueprint CRUD
 **Goal**: AI assistants can manage Warudo blueprints -- creating graphs with specified nodes and connections, and managing the lifecycle of existing graphs
@@ -99,6 +99,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 |-------|----------------|--------|-----------|
 | 1. MCP Server Foundation | 2/2 | Complete    | 2026-03-09 |
 | 2. Scene Inspection | 2/2 | Complete    | 2026-03-09 |
-| 3. Asset Control | 0/TBD | Not started | - |
+| 3. Asset Control | 1/1 | Complete    | 2026-03-09 |
 | 4. Blueprint CRUD | 0/TBD | Not started | - |
 | 5. Blueprint Intelligence | 0/TBD | Not started | - |
