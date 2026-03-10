@@ -6,7 +6,7 @@ import type {
   WarudoNodeJson,
   WarudoConnectionJson,
 } from "../warudo/types.js";
-import { warudoError } from "../errors.js";
+import { warudoError, errorMessage, checkResponseError } from "../errors.js";
 
 /** Extract graphs array from getScene response with defensive field name fallbacks. */
 export function extractGraphsFromScene(
@@ -60,8 +60,7 @@ export function formatBlueprintList(graphs: WarudoGraphSummary[]): string {
 
 /** list_blueprints tool handler. */
 export async function listBlueprintsHandler(
-  wsClient: WarudoWebSocketClient,
-  wsUrl: string
+  wsClient: WarudoWebSocketClient
 ) {
   try {
     await wsClient.ensureConnected();
@@ -91,7 +90,7 @@ export async function listBlueprintsHandler(
     return { content: [{ type: "text" as const, text }] };
   } catch (err) {
     return warudoError(
-      `Failed to list blueprints: ${err instanceof Error ? err.message : String(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsUrl}`
+      `Failed to list blueprints: ${errorMessage(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsClient.getUrl()}`
     );
   }
 }
@@ -198,7 +197,6 @@ export function formatCreateBlueprintResponse(
 /** create_blueprint tool handler. */
 export async function createBlueprintHandler(
   wsClient: WarudoWebSocketClient,
-  wsUrl: string,
   params: CreateBlueprintInput
 ) {
   try {
@@ -241,19 +239,16 @@ export async function createBlueprintHandler(
     const graphJson = buildGraphJson(params);
 
     // Send to Warudo via importGraph
-    // The importGraph action expects the graph as a JSON string
     await wsClient.ensureConnected();
     const response = await wsClient.send({
       action: "importGraph",
       graph: JSON.stringify(graphJson),
     });
 
-    // Check for error in response
-    const resp = response as Record<string, unknown>;
-    if (resp.error || resp.Error) {
-      const errMsg = String(resp.error ?? resp.Error);
+    const respError = checkResponseError(response as Record<string, unknown>);
+    if (respError) {
       return warudoError(
-        `Warudo rejected the blueprint: ${errMsg}\n\nThe graph JSON format may not match what Warudo expects. This is a known limitation — Warudo's ImportGraph format is not fully documented.\n\nAlternative: Use send_plugin_message to send the graph to a companion Warudo plugin that uses the C# Graph API.`
+        `Warudo rejected the blueprint: ${respError}\n\nThe graph JSON format may not match what Warudo expects. This is a known limitation — Warudo's ImportGraph format is not fully documented.\n\nAlternative: Use send_plugin_message to send the graph to a companion Warudo plugin that uses the C# Graph API.`
       );
     }
 
@@ -261,7 +256,7 @@ export async function createBlueprintHandler(
     return { content: [{ type: "text" as const, text }] };
   } catch (err) {
     return warudoError(
-      `Failed to create blueprint: ${err instanceof Error ? err.message : String(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsUrl}\n\nIf importGraph is not a recognized action, try using send_plugin_message with a companion plugin instead.`
+      `Failed to create blueprint: ${errorMessage(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsClient.getUrl()}\n\nIf importGraph is not a recognized action, try using send_plugin_message with a companion plugin instead.`
     );
   }
 }
@@ -270,7 +265,7 @@ export async function createBlueprintHandler(
 
 /** Format manage_blueprint response. */
 export function formatManageBlueprintResponse(
-  action: string,
+  action: "enable" | "disable" | "remove",
   blueprintId: string
 ): string {
   const actionPast =
@@ -285,7 +280,6 @@ export function formatManageBlueprintResponse(
 /** manage_blueprint tool handler. */
 export async function manageBlueprintHandler(
   wsClient: WarudoWebSocketClient,
-  wsUrl: string,
   params: {
     action: "enable" | "disable" | "remove";
     blueprintId: string;
@@ -295,7 +289,6 @@ export async function manageBlueprintHandler(
     await wsClient.ensureConnected();
 
     if (params.action === "enable" || params.action === "disable") {
-      // Try setting the Enabled data input on the graph entity
       const enabled = params.action === "enable";
       const response = await wsClient.send({
         action: "setEntityDataInputPortValue",
@@ -304,11 +297,10 @@ export async function manageBlueprintHandler(
         value: enabled,
       });
 
-      const resp = response as Record<string, unknown>;
-      if (resp.error || resp.Error) {
-        const errMsg = String(resp.error ?? resp.Error);
+      const respError = checkResponseError(response as Record<string, unknown>);
+      if (respError) {
         return warudoError(
-          `Failed to ${params.action} blueprint: ${errMsg}\n\nMake sure:\n- Blueprint ID is valid (use list_blueprints to find IDs)\n- The graph entity supports the "Enabled" data input port\n\nIf setEntityDataInputPortValue doesn't work on graphs, try using send_plugin_message with a companion plugin.`
+          `Failed to ${params.action} blueprint: ${respError}\n\nMake sure:\n- Blueprint ID is valid (use list_blueprints to find IDs)\n- The graph entity supports the "Enabled" data input port\n\nIf setEntityDataInputPortValue doesn't work on graphs, try using send_plugin_message with a companion plugin.`
         );
       }
 
@@ -326,17 +318,15 @@ export async function manageBlueprintHandler(
     }
 
     if (params.action === "remove") {
-      // Try removing the graph via a removeGraph action
       const response = await wsClient.send({
         action: "removeGraph",
         graphId: params.blueprintId,
       });
 
-      const resp = response as Record<string, unknown>;
-      if (resp.error || resp.Error) {
-        const errMsg = String(resp.error ?? resp.Error);
+      const respError = checkResponseError(response as Record<string, unknown>);
+      if (respError) {
         return warudoError(
-          `Failed to remove blueprint: ${errMsg}\n\nMake sure:\n- Blueprint ID is valid (use list_blueprints to find IDs)\n\nIf removeGraph is not a recognized action, try using send_plugin_message with a companion plugin that calls Context.OpenedScene.RemoveGraph().`
+          `Failed to remove blueprint: ${respError}\n\nMake sure:\n- Blueprint ID is valid (use list_blueprints to find IDs)\n\nIf removeGraph is not a recognized action, try using send_plugin_message with a companion plugin that calls Context.OpenedScene.RemoveGraph().`
         );
       }
 
@@ -358,7 +348,7 @@ export async function manageBlueprintHandler(
     );
   } catch (err) {
     return warudoError(
-      `Failed to ${params.action} blueprint: ${err instanceof Error ? err.message : String(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsUrl}\n\nUse list_blueprints to verify the blueprint ID exists.`
+      `Failed to ${params.action} blueprint: ${errorMessage(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsClient.getUrl()}\n\nUse list_blueprints to verify the blueprint ID exists.`
     );
   }
 }

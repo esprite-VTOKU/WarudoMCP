@@ -1,7 +1,7 @@
 import type { WarudoWebSocketClient } from "../warudo/websocket-client.js";
 import type { NodeTypeInfo } from "../warudo/types.js";
 import { extractGraphsFromScene } from "./blueprint-tools.js";
-import { warudoError } from "../errors.js";
+import { warudoError, errorMessage } from "../errors.js";
 
 /** Extract unique node types from all graphs in a scene response. */
 export function extractNodeTypesFromScene(
@@ -88,8 +88,7 @@ export function formatNodeTypeList(types: NodeTypeInfo[]): string {
 
 /** list_node_types tool handler. */
 export async function listNodeTypesHandler(
-  wsClient: WarudoWebSocketClient,
-  wsUrl: string
+  wsClient: WarudoWebSocketClient
 ) {
   try {
     await wsClient.ensureConnected();
@@ -102,7 +101,7 @@ export async function listNodeTypesHandler(
     return { content: [{ type: "text" as const, text }] };
   } catch (err) {
     return warudoError(
-      `Failed to list node types: ${err instanceof Error ? err.message : String(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsUrl}\n\nAlternatively, read the warudo://node-catalog resource for a curated list of common node types.`
+      `Failed to list node types: ${errorMessage(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsClient.getUrl()}\n\nAlternatively, read the warudo://node-catalog resource for a curated list of common node types.`
     );
   }
 }

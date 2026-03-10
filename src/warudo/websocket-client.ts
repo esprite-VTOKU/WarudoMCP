@@ -15,6 +15,10 @@ export class WarudoWebSocketClient {
     return this.state;
   }
 
+  getUrl(): string {
+    return this.url;
+  }
+
   async connect(): Promise<void> {
     if (this.state === "connected") return;
     if (this.state === "connecting" && this.connectPromise) {
@@ -103,7 +107,10 @@ export class WarudoWebSocketClient {
       const onMessage = (data: WebSocket.Data) => {
         try {
           const parsed = JSON.parse(data.toString()) as WarudoWebSocketResponse;
-          // Accept any response for now -- correlation will be refined in later phases
+          // Correlate by requestId if present, otherwise accept any response
+          if (parsed.requestId !== undefined && parsed.requestId !== requestId) {
+            return; // Not our response — ignore
+          }
           clearTimeout(timeout);
           this.ws?.removeListener("message", onMessage);
           resolve(parsed);
