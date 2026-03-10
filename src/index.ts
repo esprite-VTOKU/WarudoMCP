@@ -7,6 +7,7 @@ import { loadConfig } from "./config.js";
 import { WarudoWebSocketClient } from "./warudo/websocket-client.js";
 import { WarudoRestClient } from "./warudo/rest-client.js";
 import { warudoError } from "./errors.js";
+import { listBlueprintsHandler } from "./tools/blueprint-tools.js";
 
 const server = new McpServer({ name: "warudo-mcp", version: "0.1.0" });
 
@@ -375,6 +376,179 @@ server.tool(
       );
     }
   }
+);
+
+// --- Phase 3: Asset Control Tools (mutations) ---
+
+server.tool(
+  "set_data_input",
+  "Set a data input port value on a Warudo asset or node. Use get_asset_details to find available port keys and current values.",
+  {
+    entityId: z
+      .string()
+      .describe(
+        "Entity ID (UUID) of the asset or node. Get IDs from list_assets."
+      ),
+    portKey: z
+      .string()
+      .describe(
+        "Data input port key to set. Get available keys from get_asset_details."
+      ),
+    value: z
+      .unknown()
+      .describe(
+        "New value for the port. Type depends on the port (string, number, boolean, object, etc.)."
+      ),
+  },
+  async ({ entityId, portKey, value }) => {
+    try {
+      await wsClient.ensureConnected();
+      const response = await wsClient.send({
+        action: "setEntityDataInputPortValue",
+        entityId,
+        portKey,
+        value,
+      });
+
+      // Check for error in response
+      const resp = response as Record<string, unknown>;
+      if (resp.error || resp.Error) {
+        const errMsg = String(resp.error ?? resp.Error);
+        return warudoError(
+          `Warudo rejected the value change: ${errMsg}\n\nMake sure:\n- Entity ID is valid (use list_assets to find IDs)\n- Port key exists on the entity (use get_asset_details to find ports)\n- Value type matches the port's expected type`
+        );
+      }
+
+      const text = [
+        "Set data input port on entity.",
+        `Entity ID: ${entityId}`,
+        `Port: ${portKey}`,
+        `Value: ${formatPortValue(value)}`,
+      ].join("\n");
+
+      return { content: [{ type: "text", text }] };
+    } catch (err) {
+      return warudoError(
+        `Failed to set data input: ${err instanceof Error ? err.message : String(err)}\n\nMake sure:\n- Entity ID is valid (use list_assets to find IDs)\n- Port key exists on the entity (use get_asset_details to find ports)\n- Value type matches the port's expected type`
+      );
+    }
+  }
+);
+
+server.tool(
+  "invoke_trigger",
+  "Invoke a trigger port on a Warudo asset or node (e.g., play animation, take screenshot). Use get_asset_details to find available trigger ports.",
+  {
+    entityId: z
+      .string()
+      .describe(
+        "Entity ID (UUID) of the asset or node. Get IDs from list_assets."
+      ),
+    portKey: z
+      .string()
+      .describe(
+        "Trigger port key to invoke. Get available keys from get_asset_details."
+      ),
+  },
+  async ({ entityId, portKey }) => {
+    try {
+      await wsClient.ensureConnected();
+      const response = await wsClient.send({
+        action: "invokeEntityTriggerPort",
+        entityId,
+        portKey,
+      });
+
+      // Check for error in response
+      const resp = response as Record<string, unknown>;
+      if (resp.error || resp.Error) {
+        const errMsg = String(resp.error ?? resp.Error);
+        return warudoError(
+          `Warudo rejected the trigger invocation: ${errMsg}\n\nMake sure:\n- Entity ID is valid (use list_assets to find IDs)\n- Port key is a trigger port on the entity (use get_asset_details to find ports)`
+        );
+      }
+
+      const text = [
+        "Invoked trigger port on entity.",
+        `Entity ID: ${entityId}`,
+        `Trigger: ${portKey}`,
+      ].join("\n");
+
+      return { content: [{ type: "text", text }] };
+    } catch (err) {
+      return warudoError(
+        `Failed to invoke trigger: ${err instanceof Error ? err.message : String(err)}\n\nMake sure:\n- Entity ID is valid (use list_assets to find IDs)\n- Port key is a trigger port on the entity (use get_asset_details to find ports)`
+      );
+    }
+  }
+);
+
+server.tool(
+  "send_plugin_message",
+  "Send a message to a Warudo plugin. The plugin must be loaded and listening for the specified action.",
+  {
+    pluginId: z
+      .string()
+      .describe("ID of the target Warudo plugin."),
+    action: z
+      .string()
+      .describe("Action name the plugin is listening for."),
+    payload: z
+      .unknown()
+      .optional()
+      .describe("Optional payload data to send with the message."),
+  },
+  async ({ pluginId, action: pluginAction, payload }) => {
+    try {
+      await wsClient.ensureConnected();
+      // Note: the Warudo SDK expects the plugin action as a field in the message.
+      // We use "pluginAction" to avoid collision with the WebSocket "action" field name.
+      // If Warudo expects the literal field name "action" for the plugin's action,
+      // this may need adjustment when testing against a live Warudo instance.
+      const response = await wsClient.send({
+        action: "sendPluginMessage",
+        pluginId,
+        pluginAction,
+        payload: payload ?? {},
+      });
+
+      // Check for error in response
+      const resp = response as Record<string, unknown>;
+      if (resp.error || resp.Error) {
+        const errMsg = String(resp.error ?? resp.Error);
+        return warudoError(
+          `Warudo rejected the plugin message: ${errMsg}\n\nMake sure the plugin '${pluginId}' is loaded in Warudo and listening for action '${pluginAction}'.`
+        );
+      }
+
+      const payloadText =
+        payload !== undefined && payload !== null
+          ? formatPortValue(payload)
+          : "(none)";
+
+      const text = [
+        "Sent plugin message.",
+        `Plugin ID: ${pluginId}`,
+        `Action: ${pluginAction}`,
+        `Payload: ${payloadText}`,
+      ].join("\n");
+
+      return { content: [{ type: "text", text }] };
+    } catch (err) {
+      return warudoError(
+        `Failed to send plugin message: ${err instanceof Error ? err.message : String(err)}\n\nMake sure the plugin '${pluginId}' is loaded in Warudo and listening for action '${pluginAction}'.`
+      );
+    }
+  }
+);
+
+// --- Phase 4: Blueprint CRUD Tools ---
+
+server.tool(
+  "list_blueprints",
+  "List all blueprint graphs in the current Warudo scene with names, IDs, enabled status, and node counts",
+  {},
+  async () => listBlueprintsHandler(wsClient, config.warudoWsUrl)
 );
 
 /** Format a port value for display, truncating long values. */

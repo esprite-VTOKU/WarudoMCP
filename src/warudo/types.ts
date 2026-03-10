@@ -23,3 +23,34 @@ export interface WarudoAssetDetail {
   active?: boolean;
   dataInputs: Record<string, unknown>;
 }
+
+export interface WarudoGraphSummary {
+  id: string;
+  name: string;
+  enabled: boolean;
+  nodeCount: number;
+}
+
+export interface WarudoNodeJson {
+  Id: string;
+  TypeId: string;
+  Name?: string;
+  GraphPosition?: { X: number; Y: number };
+  DataInputs?: Record<string, unknown>;
+}
+
+export interface WarudoConnectionJson {
+  SourceNodeId: string;
+  SourcePort: string;
+  DestNodeId: string;
+  DestPort: string;
+}
+
+export interface WarudoGraphJson {
+  Id: string;
+  Name: string;
+  Enabled: boolean;
+  Nodes: WarudoNodeJson[];
+  FlowConnections: WarudoConnectionJson[];
+  DataConnections: WarudoConnectionJson[];
+}
