@@ -12,12 +12,26 @@ import {
   createBlueprintHandler,
   manageBlueprintHandler,
 } from "./tools/blueprint-tools.js";
+import { listNodeTypesHandler } from "./tools/node-catalog-tools.js";
+import { getNodeCatalogResource } from "./resources/node-catalog.js";
 
 const server = new McpServer({ name: "warudo-mcp", version: "0.1.0" });
 
 const config = loadConfig();
 const wsClient = new WarudoWebSocketClient(config.warudoWsUrl);
 const restClient = new WarudoRestClient(config.warudoRestUrl);
+
+// --- MCP Resources ---
+
+server.resource(
+  "node-catalog",
+  "warudo://node-catalog",
+  {
+    description:
+      "Warudo node type reference catalog with ports, connection rules, and common blueprint patterns. Read this before generating blueprints.",
+  },
+  getNodeCatalogResource()
+);
 
 server.tool("ping", "Check if the MCP server is running and can reach Warudo", {}, async () => {
   try {
@@ -557,7 +571,7 @@ server.tool(
 
 server.tool(
   "create_blueprint",
-  "Create a new blueprint graph in Warudo with specified nodes and connections. Nodes are referenced by index (0-based) in connection definitions.",
+  "Create a new blueprint graph in Warudo with specified nodes and connections. Nodes are referenced by index (0-based) in connection definitions. To generate blueprints from natural language: 1) Read warudo://node-catalog for available node types and connection patterns, 2) Use list_node_types to discover additional node types in the user's scene, 3) Build the nodes array with correct typeId values, 4) Connect nodes with flowConnections (Exit->Enter for execution order) and dataConnections (for passing values). If unsure about node types or ports, ask the user for clarification rather than guessing.",
   {
     name: z.string().describe("Name for the new blueprint graph"),
     enabled: z
@@ -645,6 +659,16 @@ server.tool(
   },
   async (params) =>
     manageBlueprintHandler(wsClient, config.warudoWsUrl, params)
+);
+
+// --- Phase 5: Blueprint Intelligence Tools ---
+// Tool count: 13 (2 Phase 1 + 4 Phase 2 + 3 Phase 3 + 3 Phase 4 + 1 Phase 5) — within 8-15 target
+
+server.tool(
+  "list_node_types",
+  "List all node types currently used in Warudo scene blueprints. Shows type IDs, usage counts, example names, and observed data input keys. Use this to discover available node types before generating blueprints with create_blueprint. For a curated reference of common node types and connection patterns, read the warudo://node-catalog resource.",
+  {},
+  async () => listNodeTypesHandler(wsClient, config.warudoWsUrl)
 );
 
 /** Format a port value for display, truncating long values. */

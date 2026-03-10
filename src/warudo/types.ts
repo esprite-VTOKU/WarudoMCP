@@ -54,3 +54,10 @@ export interface WarudoGraphJson {
   FlowConnections: WarudoConnectionJson[];
   DataConnections: WarudoConnectionJson[];
 }
+
+export interface NodeTypeInfo {
+  typeId: string;
+  usageCount: number;
+  exampleNames: string[];
+  dataInputKeys: string[];
+}
