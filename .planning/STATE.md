@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-09T23:10:49.785Z"
+status: in_progress
+last_updated: "2026-03-09T23:05:00.000Z"
 progress:
-  total_phases: 1
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_phases: 2
+  completed_phases: 2
+  total_plans: 4
+  completed_plans: 4
 ---
 
 # Project State
@@ -18,33 +18,34 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-09)
 
 **Core value:** AI assistants can fully control Warudo through a standards-compliant MCP server.
-**Current focus:** Phase 1 - MCP Server Foundation
+**Current focus:** Phase 3 - Asset Control
 
 ## Current Position
 
-Phase: 1 of 5 (MCP Server Foundation) -- COMPLETE
+Phase: 2 of 5 (Scene Inspection) -- COMPLETE
 Plan: 2 of 2 in current phase
 Status: Phase complete
-Last activity: 2026-03-09 -- Completed 01-02 (MCP server entry point)
+Last activity: 2026-03-09 -- Completed 02-02 (asset detail inspection tool)
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 4
 - Average duration: 2 min
-- Total execution time: 0.07 hours
+- Total execution time: 0.15 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-mcp-server-foundation | 2 | 4 min | 2 min |
+| 02-scene-inspection | 2 | 5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3 min), 01-02 (1 min)
-- Trend: accelerating
+- Last 5 plans: 01-01 (3 min), 01-02 (1 min), 02-01 (3 min), 02-02 (2 min)
+- Trend: consistent
 
 *Updated after each plan completion*
 
@@ -63,6 +64,11 @@ Recent decisions affecting current work:
 - [01-01]: REST client separates network errors from HTTP status errors with different actionable messages
 - [01-02]: check_connection tests WebSocket and REST independently so one failure does not mask the other
 - [01-02]: ping tool reports wsClient.getState() in both success and error paths for LLM visibility
+- [02-01]: Tools registered inline in index.ts (consistent with Phase 1 pattern; refactor to separate files when count exceeds ~8)
+- [02-01]: list_assets uses defensive response parsing with multiple field name fallbacks (id/Id/guid, name/Name, type/Type/$type)
+- [02-01]: WebSocket action "getScene" is best-guess; may need adjustment when tested against running Warudo
+- [02-02]: get_asset_details truncates long values (>500 chars) to manage AI context window
+- [02-02]: Actionable errors: missing asset suggests list_assets, missing port lists available ports
 
 ### Pending Todos
 
@@ -71,10 +77,11 @@ None yet.
 ### Blockers/Concerns
 
 - Blueprint JSON import: Warudo docs call the format "hacky and not recommended" -- need to verify viability in Phase 4
-- Tool granularity: Research recommends 8-15 coarse-grained tools to avoid LLM context overload; design decisions needed in Phase 1 planning
+- Tool granularity: 6 tools registered so far (2 Phase 1 + 4 Phase 2), within the 8-15 target range for all phases
+- WebSocket protocol uncertainty: getScene action name and response structure unverified against running Warudo instance
 
 ## Session Continuity
 
 Last session: 2026-03-09
-Stopped at: Completed 01-02-PLAN.md (MCP server entry point) -- Phase 1 complete
+Stopped at: Completed 02-02-PLAN.md (asset detail inspection) -- Phase 2 complete
 Resume file: None

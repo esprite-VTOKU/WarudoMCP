@@ -13,7 +13,7 @@ WarudoMCP delivers AI control over Warudo through five phases: establish the MCP
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: MCP Server Foundation** - Project scaffolding, WebSocket/REST clients, stdio transport, error handling
-- [ ] **Phase 2: Scene Inspection** - Read-only tools for querying scene state, assets, and server info
+- [x] **Phase 2: Scene Inspection** - Read-only tools for querying scene state, assets, and server info
 - [ ] **Phase 3: Asset Control** - Mutation tools for setting values, invoking triggers, and messaging plugins
 - [ ] **Phase 4: Blueprint CRUD** - Create, list, enable, disable, and remove blueprint graphs
 - [ ] **Phase 5: Blueprint Intelligence** - Natural language to blueprint generation
@@ -45,10 +45,11 @@ Plans:
   2. User can ask the AI to read any specific asset's data input port values by providing its entity ID
   3. User can ask the AI what Warudo version is running, what plugins are loaded, and what scenes are available
   4. Scene inspection tools work without modifying any scene state (read-only guarantee)
-**Plans**: TBD
+**Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 02-01: TBD
+- [x] 02-01-PLAN.md -- Server info, scene listing, and asset listing tools (REST + WebSocket)
+- [x] 02-02-PLAN.md -- Asset detail inspection tool (read asset data input ports by entity ID)
 
 ### Phase 3: Asset Control
 **Goal**: AI assistants can modify Warudo scene state -- setting asset properties, triggering actions, and communicating with plugins
@@ -97,7 +98,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. MCP Server Foundation | 2/2 | Complete    | 2026-03-09 |
-| 2. Scene Inspection | 0/TBD | Not started | - |
+| 2. Scene Inspection | 2/2 | Complete    | 2026-03-09 |
 | 3. Asset Control | 0/TBD | Not started | - |
 | 4. Blueprint CRUD | 0/TBD | Not started | - |
 | 5. Blueprint Intelligence | 0/TBD | Not started | - |

@@ -15,9 +15,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Scene Inspection
 
-- [ ] **SCNE-01**: User can list all assets in the current scene with their types and IDs
-- [ ] **SCNE-02**: User can read any asset's data input port values by entity ID
-- [ ] **SCNE-03**: User can get Warudo version info, loaded plugins, and available scenes
+- [x] **SCNE-01**: User can list all assets in the current scene with their types and IDs
+- [x] **SCNE-02**: User can read any asset's data input port values by entity ID
+- [x] **SCNE-03**: User can get Warudo version info, loaded plugins, and available scenes
 
 ### Asset Control
 
@@ -80,9 +80,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONN-01 | Phase 1: MCP Server Foundation | Complete |
 | CONN-02 | Phase 1: MCP Server Foundation | Complete |
 | CONN-03 | Phase 1: MCP Server Foundation | Complete |
-| SCNE-01 | Phase 2: Scene Inspection | Pending |
-| SCNE-02 | Phase 2: Scene Inspection | Pending |
-| SCNE-03 | Phase 2: Scene Inspection | Pending |
+| SCNE-01 | Phase 2: Scene Inspection | Complete |
+| SCNE-02 | Phase 2: Scene Inspection | Complete |
+| SCNE-03 | Phase 2: Scene Inspection | Complete |
 | CTRL-01 | Phase 3: Asset Control | Pending |
 | CTRL-02 | Phase 3: Asset Control | Pending |
 | CTRL-03 | Phase 3: Asset Control | Pending |
@@ -97,4 +97,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after 01-02 completion*
+*Last updated: 2026-03-09 after 02-02 completion*
