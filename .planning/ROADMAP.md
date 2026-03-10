@@ -85,10 +85,11 @@ Plans:
   1. User can describe a desired behavior in natural language (e.g., "when I press spacebar, make the character wave") and the AI generates and imports a working blueprint into Warudo
   2. Generated blueprints use correct node types, valid port connections, and proper data/flow wiring
   3. When a blueprint description is ambiguous or references unknown capabilities, the AI asks clarifying questions or explains what is not possible rather than generating invalid graphs
-**Plans**: TBD
+**Plans**: 0/2 plans complete
 
 Plans:
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md -- Node type extraction tool (list_node_types) and helpers
+- [ ] 05-02-PLAN.md -- MCP node catalog resource, index.ts integration, enhanced descriptions
 
 ## Progress
 
