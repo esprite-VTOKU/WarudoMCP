@@ -244,6 +244,158 @@ server.tool(
   }
 );
 
+server.tool(
+  "get_asset_details",
+  "Read data input port values for a specific asset by entity ID. Use list_assets first to find entity IDs.",
+  {
+    entityId: z
+      .string()
+      .describe(
+        "The entity ID (UUID) of the asset to inspect. Get IDs from list_assets."
+      ),
+    port_key: z
+      .string()
+      .optional()
+      .describe(
+        "Specific data input port key to read. Omit to get all ports."
+      ),
+  },
+  async ({ entityId, port_key }) => {
+    try {
+      await wsClient.ensureConnected();
+      const response = await wsClient.send({ action: "getScene" });
+
+      // Extract assets from response (same pattern as list_assets)
+      let rawAssets: unknown[] | undefined;
+      const resp = response as Record<string, unknown>;
+
+      if (Array.isArray(resp.assets)) {
+        rawAssets = resp.assets;
+      } else if (resp.data && typeof resp.data === "object") {
+        const data = resp.data as Record<string, unknown>;
+        if (Array.isArray(data.assets)) {
+          rawAssets = data.assets;
+        }
+      }
+
+      if (!rawAssets) {
+        console.error(
+          "get_asset_details: unexpected response structure, keys:",
+          Object.keys(resp)
+        );
+        return warudoError(
+          `Unexpected response from Warudo when querying assets. Response keys: ${Object.keys(resp).join(", ")}\n\nThe WebSocket action "getScene" may not be supported. Try check_connection to verify connectivity.`
+        );
+      }
+
+      // Find asset by entity ID
+      const asset = rawAssets.find((a: unknown) => {
+        const obj = a as Record<string, unknown>;
+        return (
+          String(obj.id ?? obj.Id ?? obj.guid ?? "") === entityId
+        );
+      }) as Record<string, unknown> | undefined;
+
+      if (!asset) {
+        return warudoError(
+          `Asset not found with ID: ${entityId}\n\nUse list_assets to see available assets and their IDs.`
+        );
+      }
+
+      const name = String(asset.name ?? asset.Name ?? "unnamed");
+      const type = String(asset.type ?? asset.Type ?? asset.$type ?? "unknown");
+      const active = asset.active ?? asset.Active ?? asset.isActive;
+
+      // Extract data input ports
+      const dataInputs: Record<string, unknown> =
+        (asset.dataInputs as Record<string, unknown>) ??
+        (asset.DataInputs as Record<string, unknown>) ??
+        (asset.data as Record<string, unknown>) ??
+        {};
+
+      // If port_key specified, return just that port
+      if (port_key) {
+        if (!(port_key in dataInputs)) {
+          const availablePorts = Object.keys(dataInputs);
+          const portList =
+            availablePorts.length > 20
+              ? availablePorts.slice(0, 20).join(", ") +
+                ` ... and ${availablePorts.length - 20} more`
+              : availablePorts.join(", ");
+
+          return warudoError(
+            `Port '${port_key}' not found on asset '${name}' (${type}).\n\nAvailable ports: ${portList || "(none found)"}`
+          );
+        }
+
+        const value = dataInputs[port_key];
+        const formatted = formatPortValue(value);
+
+        const text = [
+          `Asset: ${name} (${type}) [ID: ${entityId}]`,
+          `Port: ${port_key}`,
+          `Value: ${formatted}`,
+        ].join("\n");
+
+        return { content: [{ type: "text", text }] };
+      }
+
+      // Return all ports
+      const portEntries = Object.entries(dataInputs);
+
+      if (portEntries.length === 0) {
+        const text = [
+          `Asset: ${name} (${type}) [ID: ${entityId}]`,
+          `Active: ${active === false ? "no" : "yes"}`,
+          "",
+          "Data Input Ports: (none found)",
+          "",
+          "Note: The asset may have properties stored in a different format. Check the raw response structure.",
+        ].join("\n");
+
+        return { content: [{ type: "text", text }] };
+      }
+
+      const portLines = portEntries.map(
+        ([key, val]) => `  ${key}: ${formatPortValue(val)}`
+      );
+
+      const text = [
+        `Asset: ${name} (${type}) [ID: ${entityId}]`,
+        `Active: ${active === false ? "no" : "yes"}`,
+        "",
+        `Data Input Ports (${portEntries.length}):`,
+        ...portLines,
+      ].join("\n");
+
+      return { content: [{ type: "text", text }] };
+    } catch (err) {
+      return warudoError(
+        `Failed to read asset details: ${err instanceof Error ? err.message : String(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${config.warudoWsUrl}`
+      );
+    }
+  }
+);
+
+/** Format a port value for display, truncating long values. */
+function formatPortValue(value: unknown): string {
+  if (value === null || value === undefined) {
+    return "null";
+  }
+  if (typeof value === "string") {
+    return value.length > 500
+      ? value.slice(0, 500) + "... (truncated)"
+      : value;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  const json = JSON.stringify(value, null, 2);
+  return json.length > 500
+    ? json.slice(0, 500) + "... (truncated)"
+    : json;
+}
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
