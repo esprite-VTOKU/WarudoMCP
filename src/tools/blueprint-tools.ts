@@ -1,5 +1,11 @@
+import { randomUUID } from "crypto";
 import type { WarudoWebSocketClient } from "../warudo/websocket-client.js";
-import type { WarudoGraphSummary } from "../warudo/types.js";
+import type {
+  WarudoGraphSummary,
+  WarudoGraphJson,
+  WarudoNodeJson,
+  WarudoConnectionJson,
+} from "../warudo/types.js";
 import { warudoError } from "../errors.js";
 
 /** Extract graphs array from getScene response with defensive field name fallbacks. */
@@ -86,6 +92,273 @@ export async function listBlueprintsHandler(
   } catch (err) {
     return warudoError(
       `Failed to list blueprints: ${err instanceof Error ? err.message : String(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsUrl}`
+    );
+  }
+}
+
+// --- Blueprint Creation ---
+
+/** Input types for create_blueprint tool parameters. */
+export interface CreateBlueprintInput {
+  name: string;
+  enabled?: boolean;
+  nodes: Array<{
+    typeId: string;
+    name?: string;
+    dataInputs?: Record<string, unknown>;
+    position?: { x: number; y: number };
+  }>;
+  dataConnections?: Array<{
+    sourceNodeIndex: number;
+    sourcePort: string;
+    destNodeIndex: number;
+    destPort: string;
+  }>;
+  flowConnections?: Array<{
+    sourceNodeIndex: number;
+    sourcePort: string;
+    destNodeIndex: number;
+    destPort: string;
+  }>;
+}
+
+/** Build a Warudo graph JSON from structured input. */
+export function buildGraphJson(input: CreateBlueprintInput): WarudoGraphJson {
+  const graphId = randomUUID();
+
+  // Generate node IDs and build node objects
+  const nodeIds: string[] = [];
+  const nodes: WarudoNodeJson[] = input.nodes.map((n, i) => {
+    const nodeId = randomUUID();
+    nodeIds.push(nodeId);
+    return {
+      Id: nodeId,
+      TypeId: n.typeId,
+      Name: n.name,
+      GraphPosition: n.position
+        ? { X: n.position.x, Y: n.position.y }
+        : { X: (i % 4) * 300, Y: Math.floor(i / 4) * 300 },
+      DataInputs: n.dataInputs ?? {},
+    };
+  });
+
+  // Build connections using node indices -> node IDs
+  const resolveConnection = (conn: {
+    sourceNodeIndex: number;
+    sourcePort: string;
+    destNodeIndex: number;
+    destPort: string;
+  }): WarudoConnectionJson | null => {
+    if (conn.sourceNodeIndex < 0 || conn.sourceNodeIndex >= nodeIds.length)
+      return null;
+    if (conn.destNodeIndex < 0 || conn.destNodeIndex >= nodeIds.length)
+      return null;
+    return {
+      SourceNodeId: nodeIds[conn.sourceNodeIndex],
+      SourcePort: conn.sourcePort,
+      DestNodeId: nodeIds[conn.destNodeIndex],
+      DestPort: conn.destPort,
+    };
+  };
+
+  const dataConnections = (input.dataConnections ?? [])
+    .map(resolveConnection)
+    .filter((c): c is WarudoConnectionJson => c !== null);
+
+  const flowConnections = (input.flowConnections ?? [])
+    .map(resolveConnection)
+    .filter((c): c is WarudoConnectionJson => c !== null);
+
+  return {
+    Id: graphId,
+    Name: input.name,
+    Enabled: input.enabled !== false,
+    Nodes: nodes,
+    DataConnections: dataConnections,
+    FlowConnections: flowConnections,
+  };
+}
+
+/** Format the create_blueprint success response. */
+export function formatCreateBlueprintResponse(
+  graphJson: WarudoGraphJson
+): string {
+  const lines = [
+    "Blueprint created successfully.",
+    `Name: ${graphJson.Name}`,
+    `ID: ${graphJson.Id}`,
+    `Nodes: ${graphJson.Nodes.length}`,
+    `Data Connections: ${graphJson.DataConnections.length}`,
+    `Flow Connections: ${graphJson.FlowConnections.length}`,
+    `Enabled: ${graphJson.Enabled}`,
+  ];
+  return lines.join("\n");
+}
+
+/** create_blueprint tool handler. */
+export async function createBlueprintHandler(
+  wsClient: WarudoWebSocketClient,
+  wsUrl: string,
+  params: CreateBlueprintInput
+) {
+  try {
+    // Validate at least one node exists
+    if (!params.nodes || params.nodes.length === 0) {
+      return warudoError(
+        "Blueprint must have at least one node.\n\nProvide a nodes array with at least one entry, each with a typeId field."
+      );
+    }
+
+    // Validate node typeIds are non-empty
+    for (let i = 0; i < params.nodes.length; i++) {
+      if (!params.nodes[i].typeId || params.nodes[i].typeId.trim() === "") {
+        return warudoError(
+          `Node at index ${i} has an empty typeId.\n\nEvery node must have a typeId (e.g., a GUID like "e931f780-e41e-40ce-96d0-a4d47ca64853" or a type name).`
+        );
+      }
+    }
+
+    // Validate connection indices
+    const nodeCount = params.nodes.length;
+    const allConnections = [
+      ...(params.dataConnections ?? []),
+      ...(params.flowConnections ?? []),
+    ];
+    for (const conn of allConnections) {
+      if (conn.sourceNodeIndex < 0 || conn.sourceNodeIndex >= nodeCount) {
+        return warudoError(
+          `Connection references sourceNodeIndex ${conn.sourceNodeIndex} but only ${nodeCount} nodes exist (indices 0-${nodeCount - 1}).`
+        );
+      }
+      if (conn.destNodeIndex < 0 || conn.destNodeIndex >= nodeCount) {
+        return warudoError(
+          `Connection references destNodeIndex ${conn.destNodeIndex} but only ${nodeCount} nodes exist (indices 0-${nodeCount - 1}).`
+        );
+      }
+    }
+
+    // Build graph JSON
+    const graphJson = buildGraphJson(params);
+
+    // Send to Warudo via importGraph
+    // The importGraph action expects the graph as a JSON string
+    await wsClient.ensureConnected();
+    const response = await wsClient.send({
+      action: "importGraph",
+      graph: JSON.stringify(graphJson),
+    });
+
+    // Check for error in response
+    const resp = response as Record<string, unknown>;
+    if (resp.error || resp.Error) {
+      const errMsg = String(resp.error ?? resp.Error);
+      return warudoError(
+        `Warudo rejected the blueprint: ${errMsg}\n\nThe graph JSON format may not match what Warudo expects. This is a known limitation — Warudo's ImportGraph format is not fully documented.\n\nAlternative: Use send_plugin_message to send the graph to a companion Warudo plugin that uses the C# Graph API.`
+      );
+    }
+
+    const text = formatCreateBlueprintResponse(graphJson);
+    return { content: [{ type: "text" as const, text }] };
+  } catch (err) {
+    return warudoError(
+      `Failed to create blueprint: ${err instanceof Error ? err.message : String(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsUrl}\n\nIf importGraph is not a recognized action, try using send_plugin_message with a companion plugin instead.`
+    );
+  }
+}
+
+// --- Blueprint Lifecycle Management ---
+
+/** Format manage_blueprint response. */
+export function formatManageBlueprintResponse(
+  action: string,
+  blueprintId: string
+): string {
+  const actionPast =
+    action === "enable"
+      ? "enabled"
+      : action === "disable"
+        ? "disabled"
+        : "removed";
+  return `Blueprint ${actionPast} successfully.\nBlueprint ID: ${blueprintId}`;
+}
+
+/** manage_blueprint tool handler. */
+export async function manageBlueprintHandler(
+  wsClient: WarudoWebSocketClient,
+  wsUrl: string,
+  params: {
+    action: "enable" | "disable" | "remove";
+    blueprintId: string;
+  }
+) {
+  try {
+    await wsClient.ensureConnected();
+
+    if (params.action === "enable" || params.action === "disable") {
+      // Try setting the Enabled data input on the graph entity
+      const enabled = params.action === "enable";
+      const response = await wsClient.send({
+        action: "setEntityDataInputPortValue",
+        entityId: params.blueprintId,
+        portKey: "Enabled",
+        value: enabled,
+      });
+
+      const resp = response as Record<string, unknown>;
+      if (resp.error || resp.Error) {
+        const errMsg = String(resp.error ?? resp.Error);
+        return warudoError(
+          `Failed to ${params.action} blueprint: ${errMsg}\n\nMake sure:\n- Blueprint ID is valid (use list_blueprints to find IDs)\n- The graph entity supports the "Enabled" data input port\n\nIf setEntityDataInputPortValue doesn't work on graphs, try using send_plugin_message with a companion plugin.`
+        );
+      }
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: formatManageBlueprintResponse(
+              params.action,
+              params.blueprintId
+            ),
+          },
+        ],
+      };
+    }
+
+    if (params.action === "remove") {
+      // Try removing the graph via a removeGraph action
+      const response = await wsClient.send({
+        action: "removeGraph",
+        graphId: params.blueprintId,
+      });
+
+      const resp = response as Record<string, unknown>;
+      if (resp.error || resp.Error) {
+        const errMsg = String(resp.error ?? resp.Error);
+        return warudoError(
+          `Failed to remove blueprint: ${errMsg}\n\nMake sure:\n- Blueprint ID is valid (use list_blueprints to find IDs)\n\nIf removeGraph is not a recognized action, try using send_plugin_message with a companion plugin that calls Context.OpenedScene.RemoveGraph().`
+        );
+      }
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: formatManageBlueprintResponse(
+              params.action,
+              params.blueprintId
+            ),
+          },
+        ],
+      };
+    }
+
+    return warudoError(
+      `Unknown action: ${params.action}\n\nValid actions: enable, disable, remove`
+    );
+  } catch (err) {
+    return warudoError(
+      `Failed to ${params.action} blueprint: ${err instanceof Error ? err.message : String(err)}\n\nMake sure Warudo is running and connected via WebSocket on ${wsUrl}\n\nUse list_blueprints to verify the blueprint ID exists.`
     );
   }
 }

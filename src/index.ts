@@ -7,7 +7,11 @@ import { loadConfig } from "./config.js";
 import { WarudoWebSocketClient } from "./warudo/websocket-client.js";
 import { WarudoRestClient } from "./warudo/rest-client.js";
 import { warudoError } from "./errors.js";
-import { listBlueprintsHandler } from "./tools/blueprint-tools.js";
+import {
+  listBlueprintsHandler,
+  createBlueprintHandler,
+  manageBlueprintHandler,
+} from "./tools/blueprint-tools.js";
 
 const server = new McpServer({ name: "warudo-mcp", version: "0.1.0" });
 
@@ -549,6 +553,98 @@ server.tool(
   "List all blueprint graphs in the current Warudo scene with names, IDs, enabled status, and node counts",
   {},
   async () => listBlueprintsHandler(wsClient, config.warudoWsUrl)
+);
+
+server.tool(
+  "create_blueprint",
+  "Create a new blueprint graph in Warudo with specified nodes and connections. Nodes are referenced by index (0-based) in connection definitions.",
+  {
+    name: z.string().describe("Name for the new blueprint graph"),
+    enabled: z
+      .boolean()
+      .optional()
+      .describe("Whether to enable the graph immediately (default: true)"),
+    nodes: z
+      .array(
+        z.object({
+          typeId: z
+            .string()
+            .describe(
+              "Node type ID (GUID or type name, e.g., 'OnUpdateNode' or a GUID like 'e931f780-...')"
+            ),
+          name: z.string().optional().describe("Optional display name for the node"),
+          dataInputs: z
+            .record(z.unknown())
+            .optional()
+            .describe("Initial data input values as key-value pairs"),
+          position: z
+            .object({
+              x: z.number(),
+              y: z.number(),
+            })
+            .optional()
+            .describe("Graph editor position (auto-positioned if omitted)"),
+        })
+      )
+      .describe("Array of nodes to add to the blueprint"),
+    dataConnections: z
+      .array(
+        z.object({
+          sourceNodeIndex: z
+            .number()
+            .describe("Index of source node in nodes array (0-based)"),
+          sourcePort: z
+            .string()
+            .describe("Data output port name on source node"),
+          destNodeIndex: z
+            .number()
+            .describe("Index of destination node in nodes array (0-based)"),
+          destPort: z
+            .string()
+            .describe("Data input port name on destination node"),
+        })
+      )
+      .optional()
+      .describe("Data connections between nodes (pass data values)"),
+    flowConnections: z
+      .array(
+        z.object({
+          sourceNodeIndex: z
+            .number()
+            .describe("Index of source node in nodes array (0-based)"),
+          sourcePort: z
+            .string()
+            .describe("Flow output port name on source node (e.g., 'Exit')"),
+          destNodeIndex: z
+            .number()
+            .describe("Index of destination node in nodes array (0-based)"),
+          destPort: z
+            .string()
+            .describe("Flow input port name on destination node (e.g., 'Enter')"),
+        })
+      )
+      .optional()
+      .describe("Flow connections between nodes (execution order)"),
+  },
+  async (params) =>
+    createBlueprintHandler(wsClient, config.warudoWsUrl, params)
+);
+
+server.tool(
+  "manage_blueprint",
+  "Enable, disable, or remove an existing blueprint graph. Use list_blueprints to find blueprint IDs.",
+  {
+    action: z
+      .enum(["enable", "disable", "remove"])
+      .describe("Action to perform on the blueprint"),
+    blueprintId: z
+      .string()
+      .describe(
+        "ID (UUID) of the blueprint graph. Get IDs from list_blueprints."
+      ),
+  },
+  async (params) =>
+    manageBlueprintHandler(wsClient, config.warudoWsUrl, params)
 );
 
 /** Format a port value for display, truncating long values. */
