@@ -55,7 +55,13 @@ Requirements for initial release. Each maps to roadmap phases.
 - **BPRT-04**: Template-based blueprint creation (common patterns as presets)
 - **BPRT-05**: Blueprint validation before import (check node types, port compatibility)
 
-### Plugin Ecosystem
+### Companion Plugin (v1)
+
+- [ ] **PLGN-03**: Plugin exposes full node type registry (all available node types including plugin-installed) via WebSocket
+- [ ] **PLGN-04**: Plugin provides in-Warudo UI for MCP connection configuration and status
+- [ ] **PLGN-05**: Plugin connects directly to Claude API from within Warudo for Warudo-initiated AI interactions
+
+### Plugin Ecosystem (v2)
 
 - **PLGN-01**: Plugin discovery and capability listing
 - **PLGN-02**: Schema export for C# plugin reuse (JSON Schema from Zod definitions)
@@ -65,7 +71,7 @@ Requirements for initial release. Each maps to roadmap phases.
 | Feature | Reason |
 |---------|--------|
 | SSE/HTTP transport | stdio sufficient for v1; broadest MCP client support |
-| Warudo C# plugin | Future project, not part of MCP server |
+| Warudo C# plugin standalone (without MCP server) | Plugin works alongside the MCP server, not as a replacement |
 | Custom GUI/dashboard | Headless MCP server, no UI needed |
 | Real-time streaming data | MCP is request-response, not streaming |
 | Direct blend shape manipulation | Use Warudo's built-in nodes via blueprints instead |
@@ -89,10 +95,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BPRT-01 | Phase 4: Blueprint CRUD | Pending |
 | BPRT-02 | Phase 4: Blueprint CRUD | Pending |
 | BPRT-03 | Phase 5: Blueprint Intelligence | Complete |
+| PLGN-03 | Phase 6: Warudo Companion Plugin | Pending |
+| PLGN-04 | Phase 6: Warudo Companion Plugin | Pending |
+| PLGN-05 | Phase 6: Warudo Companion Plugin | Pending |
 
 **Coverage:**
-- v1 requirements: 12 total
-- Mapped to phases: 12
+- v1 requirements: 15 total
+- Mapped to phases: 15
 - Unmapped: 0
 
 ---

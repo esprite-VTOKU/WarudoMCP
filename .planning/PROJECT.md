@@ -2,11 +2,16 @@
 
 ## What This Is
 
-An MCP (Model Context Protocol) server that gives AI assistants full control over Warudo, the 3D VTubing software. It connects to Warudo's WebSocket API and exposes every available endpoint as MCP tools — enabling AI-driven avatar control, scene management, and blueprint generation through natural language.
+A two-component system for AI-driven control of Warudo, the 3D VTubing software:
+
+1. **TypeScript MCP server** — connects to Warudo's WebSocket/REST APIs, exposes MCP tools for avatar control, scene management, and blueprint generation
+2. **C# Warudo companion plugin** — extends Warudo's API surface (e.g., full node type registry), provides in-Warudo UI for MCP configuration and control
+
+Both live in this monorepo. The plugin is compiled separately in a Warudo mod project.
 
 ## Core Value
 
-AI assistants can fully control Warudo — manipulating avatars, scenes, and generating blueprints — through a standards-compliant MCP server that any MCP client can connect to.
+AI assistants can fully control Warudo — manipulating avatars, scenes, and generating blueprints — through an MCP server and companion Warudo plugin that work together to expose the full Warudo API surface.
 
 ## Requirements
 
@@ -22,13 +27,15 @@ AI assistants can fully control Warudo — manipulating avatars, scenes, and gen
 - [ ] Blueprint generation — create any valid Warudo blueprint from natural language descriptions
 - [ ] Read scene state (query current avatar, props, camera, environment)
 - [ ] stdio transport for standard MCP client compatibility (Claude Desktop, Cursor, etc.)
-- [ ] Architecture designed so a future Warudo plugin can reuse tool definitions and connect to Claude directly from inside Warudo
+- [ ] Companion Warudo C# plugin that exposes internal APIs (node type registry, blueprint internals) via WebSocket
+- [ ] In-Warudo UI for MCP connection configuration and control
+- [ ] Plugin connects Warudo directly to Claude API for Warudo-initiated AI interactions
+- [ ] Architecture designed so the plugin and MCP server share tool definitions
 
 ### Out of Scope
 
-- Warudo plugin development — planned for future but not part of this project
 - SSE transport — stdio sufficient for v1
-- Custom UI — this is a headless MCP server
+- Custom UI on the MCP server side — the server is headless (Warudo-side UI is in the companion plugin)
 
 ## Context
 
@@ -37,7 +44,8 @@ AI assistants can fully control Warudo — manipulating avatars, scenes, and gen
 - MCP is an open protocol by Anthropic for connecting AI assistants to external tools
 - The official MCP TypeScript SDK will be used
 - Primary use cases: AI VTubing (real-time avatar control during streams) and scene authoring (natural language scene setup and tweaking)
-- The architecture must accommodate a future Warudo C# plugin that connects to Claude, reusing the same tool definitions/schema
+- A companion C# Warudo plugin lives in this repo (under `warudo-plugin/`) but is compiled separately in a Warudo mod project
+- The plugin exposes internal Warudo APIs that the external WebSocket can't reach and provides in-Warudo MCP controls
 
 ## Constraints
 
@@ -52,9 +60,10 @@ AI assistants can fully control Warudo — manipulating avatars, scenes, and gen
 |----------|-----------|---------|
 | TypeScript over C# | Most MCP servers use TS SDK; matches ecosystem conventions | — Pending |
 | stdio transport | Standard MCP transport, broadest client support | — Pending |
-| WebSocket connection to Warudo | Uses Warudo's built-in API, no plugin required | — Pending |
+| WebSocket connection to Warudo | Uses Warudo's built-in API for base connectivity | — Pending |
 | Full API coverage for v1 | User wants comprehensive control, not a subset | — Pending |
-| Architecture supports future plugin | Tool definitions should be reusable from a Warudo C# plugin | — Pending |
+| Monorepo with separate builds | C# plugin in same repo, compiled in Warudo mod project | — Decided |
+| Plugin connects Warudo to Claude | Plugin can call Claude API directly from inside Warudo | — Decided |
 
 ---
 *Last updated: 2026-03-09 after initialization*

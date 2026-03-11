@@ -17,6 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Asset Control** - Mutation tools for setting values, invoking triggers, and messaging plugins
 - [ ] **Phase 4: Blueprint CRUD** - Create, list, enable, disable, and remove blueprint graphs
 - [x] **Phase 5: Blueprint Intelligence** - Natural language to blueprint generation
+- [ ] **Phase 6: Warudo Companion Plugin** - C# plugin exposing internal APIs, in-Warudo MCP controls, and direct Claude connection
 
 ## Phase Details
 
@@ -91,10 +92,24 @@ Plans:
 - [x] 05-01-PLAN.md -- Node type extraction tool (list_node_types) and helpers
 - [x] 05-02-PLAN.md -- MCP node catalog resource, index.ts integration, enhanced descriptions
 
+### Phase 6: Warudo Companion Plugin
+**Goal**: A C# Warudo plugin that exposes internal APIs the external WebSocket can't reach, provides in-Warudo UI for MCP configuration, and connects Warudo directly to Claude
+**Depends on**: Phase 3 (uses plugin messaging), Phase 4/5 benefit from it
+**Requirements**: PLGN-03, PLGN-04, PLGN-05
+**Success Criteria** (what must be TRUE):
+  1. Plugin exposes the full node type registry (all available node types including plugin-installed ones) via WebSocket endpoint
+  2. Plugin provides a Warudo-side UI panel to configure MCP connection settings (host, port, status)
+  3. Plugin can connect to Claude API directly from within Warudo, enabling Warudo-initiated AI interactions
+  4. Plugin lives in `warudo-plugin/` directory and compiles separately in a Warudo mod project
+**Plans**: TBD
+
+Plans:
+- [ ] 06-01: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -103,3 +118,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5
 | 3. Asset Control | 1/1 | Complete    | 2026-03-09 |
 | 4. Blueprint CRUD | 0/TBD | Not started | - |
 | 5. Blueprint Intelligence | 2/2 | Complete    | 2026-03-09 |
+| 6. Warudo Companion Plugin | 0/TBD | Not started | - |
