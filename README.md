@@ -1,4 +1,5 @@
 # WarudoMCP
+UNTESTED - STILL IN PROGRESS
 
 An MCP (Model Context Protocol) server that gives AI assistants full control over [Warudo](https://warudo.app), the 3D VTubing software. Connect Claude, Cursor, or any MCP client to manipulate avatars, manage scenes, and generate blueprints through natural language.
 
@@ -12,7 +13,7 @@ An MCP (Model Context Protocol) server that gives AI assistants full control ove
 ## Prerequisites
 
 - [Node.js](https://nodejs.org) 22 LTS or later
-- [Warudo](https://warudo.app) running with WebSocket API enabled (default port 19053) and REST API enabled (default port 19052)
+- [Warudo](https://warudo.app) running with WebSocket API (default port 19053) and REST API (default port 19052)
 
 ## Installation
 
@@ -25,7 +26,7 @@ npm run build
 
 ## Configuration
 
-WarudoMCP connects to Warudo's APIs using environment variables. Both have sensible defaults if Warudo is running locally:
+WarudoMCP connects to Warudo's APIs using environment variables. 
 
 | Variable | Default | Description |
 |----------|---------|-------------|
